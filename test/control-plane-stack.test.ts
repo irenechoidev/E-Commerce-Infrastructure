@@ -13,7 +13,7 @@ const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, {
 
 const CONTROL_PLANE_APP_NAME = 'e-commerce-control-plane';
 const LAMBDA_NAME = `${CONTROL_PLANE_APP_NAME}-lambda`;
-const LAMBDA_HANDLER = 'ecommerce.handler.ECommerceControlPlaneHandler';
+const LAMBDA_HANDLER = 'ecommerce.ECommerceControlPlaneHandler';
 const BUCKET_NAME = `${CONTROL_PLANE_APP_NAME}-bucket`;
 const BUCKET_CODE_OBJECT_KEY = 'app.jar';
 
