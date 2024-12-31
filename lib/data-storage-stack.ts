@@ -15,8 +15,3 @@ export class DataStorageStack extends Stack {
     });
   }
 }
-
-
-
-
-
