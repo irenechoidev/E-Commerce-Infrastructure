@@ -1,10 +1,18 @@
 import * as cdk from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { DataStorageStack } from '../lib/data-storage-stack';
+import { ControlPlaneStack } from '../lib/control-plane-stack';
+import { CodeArtifactStack } from '../lib/code-artifact-stack';
 
 const app = new cdk.App();
+const codeArtifactStackName = 'TestCodeArtifactStack';
+const controlPlaneStackName = 'TestControlPlaneStack';
 const dataStorageStackName = 'TestDataStorageStack';
-const dataStorageStack = new DataStorageStack(app, dataStorageStackName);
+const codeArtifactStack = new CodeArtifactStack(app, codeArtifactStackName);
+const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, { bucket: codeArtifactStack.bucket });
+const dataStorageStack = new DataStorageStack(app, dataStorageStackName, {
+  controlPlaneLambda: controlPlaneStack.lambdaFunction
+});
 
 const APP_NAME = 'e-commerce';
 const USER_TABLE = `${APP_NAME}-user-table-v1`;
