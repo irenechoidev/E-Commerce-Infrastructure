@@ -3,11 +3,17 @@ import * as cdk from 'aws-cdk-lib';
 import { ControlPlaneStack } from '../lib/control-plane-stack';
 import { REGION } from '../commons/constants';
 import { CodeArtifactStack } from '../lib/code-artifact-stack';
+import { DataStorageStack } from '../lib/data-storage-stack';
 
 const app = new cdk.App();
 
 const codeArtifactStackName = 'ECommerceCodeArtifactStack';
 const codeArtifactStack = new CodeArtifactStack(app, codeArtifactStackName, {
+  env: { region: REGION }
+});
+
+const dataStorageStackName = 'ECommerceDataStorageStack';
+const dataStorageStack = new DataStorageStack(app, dataStorageStackName, {
   env: { region: REGION }
 });
 
@@ -18,3 +24,4 @@ const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, {
 });
 
 controlPlaneStack.addDependency(codeArtifactStack);
+controlPlaneStack.addDependency(dataStorageStack);
