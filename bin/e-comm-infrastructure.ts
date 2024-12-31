@@ -12,16 +12,16 @@ const codeArtifactStack = new CodeArtifactStack(app, codeArtifactStackName, {
   env: { region: REGION }
 });
 
-const dataStorageStackName = 'ECommerceDataStorageStack';
-const dataStorageStack = new DataStorageStack(app, dataStorageStackName, {
-  env: { region: REGION }
-});
-
 const controlPlaneStackName = 'ECommerceControlPlaneStack';
 const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, {
   env: { region: REGION },
   bucket: codeArtifactStack.bucket
 });
 
+const dataStorageStackName = 'ECommerceDataStorageStack';
+new DataStorageStack(app, dataStorageStackName, {
+  env: { region: REGION },
+  controlPlaneLambda: controlPlaneStack.lambdaFunction
+});
+
 controlPlaneStack.addDependency(codeArtifactStack);
-controlPlaneStack.addDependency(dataStorageStack);
