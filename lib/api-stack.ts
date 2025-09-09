@@ -1,6 +1,6 @@
 import { Stack, Duration, type StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { EndpointType, LambdaRestApi, LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
+import { EndpointType, RestApi, LambdaIntegration } from 'aws-cdk-lib/aws-apigateway';
 import { Function } from 'aws-cdk-lib/aws-lambda';
 
 const API_NAME = 'e-commerce-api';
@@ -21,9 +21,8 @@ export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
 
-    const apiGateway = new LambdaRestApi(this, API_NAME, {
-      handler: props.controlPlaneLambda,
-      proxy: false,
+    const apiGateway = new RestApi(this, API_NAME, {
+      restApiName: API_NAME,
       endpointConfiguration: {
         types: [EndpointType.REGIONAL]
       },
