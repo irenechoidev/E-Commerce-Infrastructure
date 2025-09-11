@@ -15,7 +15,7 @@ const codeArtifactStack = new CodeArtifactStack(app, codeArtifactStackName, {
 const controlPlaneStackName = 'ECommerceControlPlaneStack';
 const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, {
   env: { region: REGION },
-  bucket: codeArtifactStack.bucket
+  codeBucket: codeArtifactStack.bucket
 });
 
 const apiStackName = 'ECommerceApiStack';

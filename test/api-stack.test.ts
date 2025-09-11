@@ -9,7 +9,9 @@ const codeArtifactStackName = 'TestCodeArtifactStack';
 const controlPlaneStackName = 'TestControlPlaneStack';
 const apiStackName = 'TestApiStack';
 const codeArtifactStack = new CodeArtifactStack(app, codeArtifactStackName);
-const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, { bucket: codeArtifactStack.bucket });
+const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, { 
+  codeBucket: codeArtifactStack.bucket 
+});
 const apiStack = new ApiStack(app, apiStackName, {
     controlPlaneLambda: controlPlaneStack.lambdaFunction
 });
