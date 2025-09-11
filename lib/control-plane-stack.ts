@@ -8,8 +8,10 @@ import { AttributeType, TableV2 } from 'aws-cdk-lib/aws-dynamodb';
 const APP_NAME = 'e-commerce';
 const CONTROL_PLANE_APP_NAME = `${APP_NAME}-control-plane`;
 const USER_TABLE = `${APP_NAME}-user-table-v1`;
-const ID_PARTITION_KEY = 'id';
+const ID_KEY = 'id';
+const PRODUCT_ID_KEY = 'productId';
 const PRODUCT_TABLE = `${APP_NAME}-product-table-v1`;
+const PRODUCT_IMAGE_TABLE = `${APP_NAME}-product-image-table-v1`;
 const LAMBDA_NAME = `${CONTROL_PLANE_APP_NAME}-lambda`;
 const LAMBDA_HANDLER = 'ecommerce.ECommerceControlPlaneHandler';
 const LAMBDA_TIMEOUT_SECONDS = 30;
@@ -55,16 +57,22 @@ export class ControlPlaneStack extends Stack {
     }));
 
     const userTable = new TableV2(this, USER_TABLE, {
-      partitionKey: { name: ID_PARTITION_KEY, type: AttributeType.STRING },
+      partitionKey: { name: ID_KEY, type: AttributeType.STRING },
       tableName: USER_TABLE
     });
 
     const productTable = new TableV2(this, PRODUCT_TABLE, {
-      partitionKey: { name: ID_PARTITION_KEY, type: AttributeType.STRING },
+      partitionKey: { name: ID_KEY, type: AttributeType.STRING },
       tableName: PRODUCT_TABLE
     });
 
-    const tables = [userTable, productTable];
+    const productImageTable = new TableV2(this, PRODUCT_IMAGE_TABLE, {
+      partitionKey: { name: PRODUCT_ID_KEY, type: AttributeType.STRING },
+      sortKey: { name: ID_KEY, type: AttributeType.STRING },
+      tableName: PRODUCT_IMAGE_TABLE
+    });
+
+    const tables = [userTable, productTable, productImageTable];
     tables.forEach(table => {
       table.grantReadWriteData(this.lambdaFunction);
     });
