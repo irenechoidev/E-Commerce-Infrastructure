@@ -7,11 +7,13 @@ const API_NAME = 'e-commerce-api';
 const API_LABEL = "api";
 const VERSION_LABEL = "v1";
 const USER_RESOURCE_LABEL = "user";
+const PRODUCT_RESOURCE_LABEL = "product";
 const GET_LABEL = "GET";
 
 const INTEGRATION_TIMEOUT_SECONDS = 29;
 const QUERY_STRING_PREFIX = 'method.request.querystring';
 const USER_ID_PARAM = `${QUERY_STRING_PREFIX}.userId`;
+const PRODUCT_ID_PARAM = `${QUERY_STRING_PREFIX}.productId`;
 
 interface ApiStackProps extends StackProps {
     controlPlaneLambda: Function
@@ -32,13 +34,19 @@ export class ApiStack extends Stack {
         timeout: Duration.seconds(INTEGRATION_TIMEOUT_SECONDS) 
     });
 
-    const userResource = apiGateway.root.addResource(API_LABEL)
-                                        .addResource(VERSION_LABEL)
-                                        .addResource(USER_RESOURCE_LABEL);
+    const baseResource = apiGateway.root.addResource(API_LABEL).addResource(VERSION_LABEL);
+    const userResource = baseResource.addResource(USER_RESOURCE_LABEL);
+    const productResource = baseResource.addResource(PRODUCT_RESOURCE_LABEL);
 
     userResource.addMethod(GET_LABEL, lambdaIntegration, {
         requestParameters: {
             [USER_ID_PARAM] : true
+        }
+    });
+
+    productResource.addMethod(GET_LABEL, lambdaIntegration, {
+        requestParameters: {
+            [PRODUCT_ID_PARAM] : true
         }
     });
   }
