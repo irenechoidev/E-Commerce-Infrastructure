@@ -54,5 +54,10 @@ export class ApiStack extends Stack {
     });
 
     productImageResource.addMethod(POST_LABEL, lambdaIntegration);
+    productImageResource.addMethod(GET_LABEL, lambdaIntegration, {
+        requestParameters: {
+          [PRODUCT_ID_PARAM] : true
+        }
+    });
   }
 }
