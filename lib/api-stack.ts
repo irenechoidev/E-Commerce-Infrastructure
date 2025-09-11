@@ -8,7 +8,9 @@ const API_LABEL = "api";
 const VERSION_LABEL = "v1";
 const USER_RESOURCE_LABEL = "user";
 const PRODUCT_RESOURCE_LABEL = "product";
+const PRODUCT_IMAGE_RESOURCE_LABEL = "image";
 const GET_LABEL = "GET";
+const POST_LABEL = "POST";
 
 const INTEGRATION_TIMEOUT_SECONDS = 29;
 const QUERY_STRING_PREFIX = 'method.request.querystring';
@@ -37,6 +39,7 @@ export class ApiStack extends Stack {
     const baseResource = apiGateway.root.addResource(API_LABEL).addResource(VERSION_LABEL);
     const userResource = baseResource.addResource(USER_RESOURCE_LABEL);
     const productResource = baseResource.addResource(PRODUCT_RESOURCE_LABEL);
+    const productImageResource = productResource.addResource(PRODUCT_IMAGE_RESOURCE_LABEL);
 
     userResource.addMethod(GET_LABEL, lambdaIntegration, {
         requestParameters: {
@@ -49,5 +52,7 @@ export class ApiStack extends Stack {
             [PRODUCT_ID_PARAM] : true
         }
     });
+
+    productImageResource.addMethod(POST_LABEL, lambdaIntegration);
   }
 }
