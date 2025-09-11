@@ -7,9 +7,8 @@ const API_NAME = 'e-commerce-api';
 const API_LABEL = "api";
 const VERSION_LABEL = "v1";
 const USER_RESOURCE_LABEL = "user";
-const GET_LABEL = "GET";
-
 const PRODUCT_RESOURCE_LABEL = "product";
+const GET_LABEL = "GET";
 
 const INTEGRATION_TIMEOUT_SECONDS = 29;
 const QUERY_STRING_PREFIX = 'method.request.querystring';
