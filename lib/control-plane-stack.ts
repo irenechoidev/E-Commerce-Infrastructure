@@ -13,11 +13,12 @@ const PRODUCT_TABLE = `${APP_NAME}-product-table-v1`;
 const LAMBDA_NAME = `${CONTROL_PLANE_APP_NAME}-lambda`;
 const LAMBDA_HANDLER = 'ecommerce.ECommerceControlPlaneHandler';
 const LAMBDA_TIMEOUT_SECONDS = 30;
-const BUCKET_NAME = `${CONTROL_PLANE_APP_NAME}-bucket`;
-const BUCKET_CODE_OBJECT_KEY = 'app.jar';
+const CODE_BUCKET_NAME = `${CONTROL_PLANE_APP_NAME}-bucket`;
+const CODE_BUCKET_CODE_OBJECT_KEY = 'app.jar';
+const IMAGES_BUCKET_NAME = `${APP_NAME}-images-bucket-v1`;
 
 interface ControlPlaneStackProps extends StackProps {
-  bucket: Bucket
+  codeBucket: Bucket
 }
 
 export class ControlPlaneStack extends Stack {
@@ -26,19 +27,30 @@ export class ControlPlaneStack extends Stack {
   constructor(scope: Construct, id: string, props: ControlPlaneStackProps) {
     super(scope, id, props);
     
-    const bucket = props.bucket;
+    const codeBucket = props.codeBucket;
     this.lambdaFunction = new Function(this, LAMBDA_NAME, {
       functionName: LAMBDA_NAME,
       runtime: Runtime.JAVA_17,
       handler: LAMBDA_HANDLER,
-      code: Code.fromBucket(bucket, BUCKET_CODE_OBJECT_KEY),
+      code: Code.fromBucket(codeBucket, CODE_BUCKET_CODE_OBJECT_KEY),
       timeout: Duration.seconds(LAMBDA_TIMEOUT_SECONDS)
     });
 
     this.lambdaFunction.addToRolePolicy(new PolicyStatement({
       actions: ['s3:GetObject'],
       resources: [
-        `arn:aws:s3:::${BUCKET_NAME}/${BUCKET_CODE_OBJECT_KEY}`
+        `arn:aws:s3:::${CODE_BUCKET_NAME}/${CODE_BUCKET_CODE_OBJECT_KEY}`
+      ],
+    }));
+
+    new Bucket(this, IMAGES_BUCKET_NAME, {
+      bucketName: IMAGES_BUCKET_NAME
+    });
+
+    this.lambdaFunction.addToRolePolicy(new PolicyStatement({
+      actions: ['s3:GetObject', 's3:PutObject'],
+      resources: [
+        `arn:aws:s3:::${IMAGES_BUCKET_NAME}/*`
       ],
     }));
 

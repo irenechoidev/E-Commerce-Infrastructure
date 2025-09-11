@@ -8,7 +8,7 @@ const codeArtifactStackName = 'TestCodeArtifactStack';
 const controlPlaneStackName = 'TestControlPlaneStack';
 const codeArtifactStack = new CodeArtifactStack(app, codeArtifactStackName);
 const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, {
-    bucket: codeArtifactStack.bucket
+    codeBucket: codeArtifactStack.bucket
 });
 
 const APP_NAME = 'e-commerce';
@@ -19,7 +19,6 @@ const PRODUCT_TABLE = `${APP_NAME}-product-table-v1`;
 const LAMBDA_NAME = `${CONTROL_PLANE_APP_NAME}-lambda`;
 const LAMBDA_HANDLER = 'ecommerce.ECommerceControlPlaneHandler';
 const LAMBDA_TIMEOUT_SECONDS = 30;
-const BUCKET_NAME = `${CONTROL_PLANE_APP_NAME}-bucket`;
 const BUCKET_CODE_OBJECT_KEY = 'app.jar';
 
 test('Control Plane Resources Created', () => {
@@ -40,6 +39,17 @@ test('Control Plane Resources Created', () => {
       Statement: Match.arrayWith([
         Match.objectLike({
           Action: 's3:GetObject',
+          Effect: 'Allow',
+        }),
+      ]),
+    },
+  });  
+
+  template.hasResourceProperties('AWS::IAM::Policy', {
+    PolicyDocument: {
+      Statement: Match.arrayWith([
+        Match.objectLike({
+          Action:  ['s3:GetObject', 's3:PutObject'],
           Effect: 'Allow',
         }),
       ]),
