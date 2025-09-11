@@ -14,7 +14,9 @@ const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, {
 const APP_NAME = 'e-commerce';
 const CONTROL_PLANE_APP_NAME = `${APP_NAME}-control-plane`;
 const USER_TABLE = `${APP_NAME}-user-table-v1`;
-const ID_PARTITION_KEY = 'id';
+const PRODUCT_IMAGE_TABLE = `${APP_NAME}-product-image-table-v1`;
+const ID_KEY = 'id';
+const PRODUCT_ID_KEY = 'productId';
 const PRODUCT_TABLE = `${APP_NAME}-product-table-v1`;
 const LAMBDA_NAME = `${CONTROL_PLANE_APP_NAME}-lambda`;
 const LAMBDA_HANDLER = 'ecommerce.ECommerceControlPlaneHandler';
@@ -64,13 +66,13 @@ test('Control Plane Tables Created', () => {
     TableName: USER_TABLE,
     KeySchema: [
       {
-        AttributeName: ID_PARTITION_KEY,
+        AttributeName: ID_KEY,
         KeyType: 'HASH'
       }
     ],
     AttributeDefinitions: [
       {
-        AttributeName: ID_PARTITION_KEY,
+        AttributeName: ID_KEY,
         AttributeType: 'S'
       }
     ]
@@ -80,13 +82,37 @@ test('Control Plane Tables Created', () => {
     TableName: PRODUCT_TABLE,
     KeySchema: [
       {
-        AttributeName: ID_PARTITION_KEY,
+        AttributeName: ID_KEY,
         KeyType: 'HASH'
       }
     ],
     AttributeDefinitions: [
       {
-        AttributeName: ID_PARTITION_KEY,
+        AttributeName: ID_KEY,
+        AttributeType: 'S'
+      }
+    ]
+  });
+
+  template.hasResourceProperties('AWS::DynamoDB::GlobalTable', {
+    TableName: PRODUCT_IMAGE_TABLE,
+    KeySchema: [
+      {
+        AttributeName: PRODUCT_ID_KEY, 
+        KeyType: 'HASH'
+      },
+      {
+        AttributeName: ID_KEY, 
+        KeyType: 'RANGE'
+      }
+    ],
+    AttributeDefinitions: [
+      {
+        AttributeName: PRODUCT_ID_KEY, 
+        AttributeType: 'S'
+      },
+      {
+        AttributeName: ID_KEY, 
         AttributeType: 'S'
       }
     ]
