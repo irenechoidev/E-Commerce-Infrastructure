@@ -64,7 +64,8 @@ export class ApiStack extends Stack {
     });
     productImageResource.addMethod(DELETE_LABEL, lambdaIntegration, {
       requestParameters: {
-        [ID_PARAM] : true
+        [ID_PARAM] : true,
+        [PRODUCT_ID_PARAM]: true
       }
   });
   }
