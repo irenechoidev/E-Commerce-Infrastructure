@@ -115,6 +115,9 @@ test('Control Plane Tables Created', () => {
         AttributeName: ID_KEY, 
         AttributeType: 'S'
       }
-    ]
+    ],
+    StreamSpecification: {
+      StreamViewType: "OLD_IMAGE"
+    }
   });
 });

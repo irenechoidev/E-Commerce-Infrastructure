@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
-import { AttributeType, TableV2 } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, StreamViewType, TableV2 } from 'aws-cdk-lib/aws-dynamodb';
 
 const APP_NAME = 'e-commerce';
 const CONTROL_PLANE_APP_NAME = `${APP_NAME}-control-plane`;
@@ -25,6 +25,7 @@ interface ControlPlaneStackProps extends StackProps {
 
 export class ControlPlaneStack extends Stack {
   public readonly lambdaFunction;
+  public readonly productImageTable;
 
   constructor(scope: Construct, id: string, props: ControlPlaneStackProps) {
     super(scope, id, props);
@@ -66,13 +67,14 @@ export class ControlPlaneStack extends Stack {
       tableName: PRODUCT_TABLE
     });
 
-    const productImageTable = new TableV2(this, PRODUCT_IMAGE_TABLE, {
+    this.productImageTable = new TableV2(this, PRODUCT_IMAGE_TABLE, {
       partitionKey: { name: PRODUCT_ID_KEY, type: AttributeType.STRING },
       sortKey: { name: ID_KEY, type: AttributeType.STRING },
-      tableName: PRODUCT_IMAGE_TABLE
+      tableName: PRODUCT_IMAGE_TABLE,
+      dynamoStream: StreamViewType.OLD_IMAGE
     });
 
-    const tables = [userTable, productTable, productImageTable];
+    const tables = [userTable, productTable, this.productImageTable];
     tables.forEach(table => {
       table.grantReadWriteData(this.lambdaFunction);
     });
