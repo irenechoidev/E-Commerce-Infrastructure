@@ -9,6 +9,8 @@ const VERSION_LABEL = "v1";
 const USER_RESOURCE_LABEL = "user";
 const PRODUCT_RESOURCE_LABEL = "product";
 const PRODUCT_IMAGE_RESOURCE_LABEL = "image";
+
+const DELETE_LABEL = "DELETE";
 const GET_LABEL = "GET";
 const POST_LABEL = "POST";
 
@@ -16,6 +18,7 @@ const INTEGRATION_TIMEOUT_SECONDS = 29;
 const QUERY_STRING_PREFIX = 'method.request.querystring';
 const USER_ID_PARAM = `${QUERY_STRING_PREFIX}.userId`;
 const PRODUCT_ID_PARAM = `${QUERY_STRING_PREFIX}.productId`;
+const ID_PARAM = `${QUERY_STRING_PREFIX}.id`;
 
 interface ApiStackProps extends StackProps {
     controlPlaneLambda: Function
@@ -59,5 +62,10 @@ export class ApiStack extends Stack {
           [PRODUCT_ID_PARAM] : true
         }
     });
+    productImageResource.addMethod(DELETE_LABEL, lambdaIntegration, {
+      requestParameters: {
+        [ID_PARAM] : true
+      }
+  });
   }
 }
