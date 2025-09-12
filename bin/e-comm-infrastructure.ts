@@ -4,6 +4,7 @@ import { ControlPlaneStack } from '../lib/control-plane-stack';
 import { REGION } from '../commons/constants';
 import { CodeArtifactStack } from '../lib/code-artifact-stack';
 import { ApiStack } from '../lib/api-stack';
+import { BgOperationsStack } from '../lib/bg-operations-stack';
 
 const app = new cdk.App();
 
@@ -24,5 +25,12 @@ const apiStack = new ApiStack(app, apiStackName, {
   controlPlaneLambda: controlPlaneStack.lambdaFunction
 });
 
+const bgOperationsStackName = 'ECommerceBgOperationsStack';
+const bgOperationsStack = new BgOperationsStack(app, bgOperationsStackName, {
+    env: { region: REGION },
+    productImageTable: controlPlaneStack.productImageTable
+});
+
+bgOperationsStack.addDependency(controlPlaneStack);
 apiStack.addDependency(controlPlaneStack);
 controlPlaneStack.addDependency(codeArtifactStack);
