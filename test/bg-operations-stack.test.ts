@@ -44,12 +44,18 @@ test('Bg Operations Resources Created', () => {
     }
   });
 
+  const isRemovePattern = JSON.stringify({ eventName: ["REMOVE"] });
   template.hasResourceProperties('AWS::Pipes::Pipe', {
     Name: PIPE_NAME,
     SourceParameters: {
       DynamoDBStreamParameters: {
         StartingPosition: "TRIM_HORIZON"
-      }
+      },
+      Filters: [
+        {
+          Pattern: isRemovePattern
+        }
+      ]
     }
   });
 });
