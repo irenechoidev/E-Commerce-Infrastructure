@@ -37,12 +37,17 @@ export class BgOperationsStack extends Stack {
 
     const ddbStreamArn = props?.productImageTable.tableStreamArn;
     if (ddbStreamArn) {
+      const isRemovePattern = JSON.stringify({ eventName: ["REMOVE"] });
+
       new CfnPipe(this, PIPE_NAME, {
         name: PIPE_NAME,
         roleArn: pipeRole.roleArn,
         sourceParameters: {
           dynamoDbStreamParameters: {
             startingPosition: "TRIM_HORIZON"
+          },
+          filterCriteria: {
+            filters: [{ pattern: isRemovePattern }]
           },
         },
         source: ddbStreamArn,
