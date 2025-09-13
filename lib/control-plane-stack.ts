@@ -26,6 +26,7 @@ interface ControlPlaneStackProps extends StackProps {
 export class ControlPlaneStack extends Stack {
   public readonly lambdaFunction;
   public readonly productImageTable;
+  public readonly imageBucket;
 
   constructor(scope: Construct, id: string, props: ControlPlaneStackProps) {
     super(scope, id, props);
@@ -46,7 +47,7 @@ export class ControlPlaneStack extends Stack {
       ],
     }));
 
-    new Bucket(this, IMAGES_BUCKET_NAME, {
+    this.imageBucket = new Bucket(this, IMAGES_BUCKET_NAME, {
       bucketName: IMAGES_BUCKET_NAME
     });
 

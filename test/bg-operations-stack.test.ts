@@ -14,7 +14,8 @@ const controlPlaneStack = new ControlPlaneStack(app, controlPlaneStackName, {
 });
 const bgOperationsStack = new BgOperationsStack(app, bgOperationsStackName, {
     productImageTable: controlPlaneStack.productImageTable,
-    codeBucket: codeArtifactStack.bucket
+    codeBucket: codeArtifactStack.bucket,
+    imageBucket: controlPlaneStack.imageBucket
 });
 
 const APP_NAME = 'e-commerce';
@@ -88,6 +89,17 @@ test('Bg Operations Resources Created', () => {
       ]),
     },
   });  
+
+  template.hasResourceProperties('AWS::IAM::Policy', {
+    PolicyDocument: {
+      Statement: Match.arrayWith([
+        Match.objectLike({
+          Action:  ['s3:GetObject', 's3:DeleteObject'],
+          Effect: 'Allow',
+        }),
+      ]),
+    },
+  }); 
 
   template.hasResourceProperties("AWS::Lambda::EventSourceMapping", {
     BatchSize: SQS_BATCH_SIZE,
