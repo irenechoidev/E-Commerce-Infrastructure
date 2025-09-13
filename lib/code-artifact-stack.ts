@@ -2,8 +2,8 @@ import { Stack, type StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 
-const CONTROL_PLANE_APP_NAME = 'e-commerce-control-plane';
-const BUCKET_NAME = `${CONTROL_PLANE_APP_NAME}-bucket`;
+const CODE_ARTIFACT_APP_NAME = 'e-commerce-code-artifact';
+const BUCKET_NAME = `${CODE_ARTIFACT_APP_NAME}-bucket`;
 
 export class CodeArtifactStack extends Stack {
   public readonly bucket: Bucket;

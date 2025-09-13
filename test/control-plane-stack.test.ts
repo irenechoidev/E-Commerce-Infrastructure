@@ -21,7 +21,7 @@ const PRODUCT_TABLE = `${APP_NAME}-product-table-v1`;
 const LAMBDA_NAME = `${CONTROL_PLANE_APP_NAME}-lambda`;
 const LAMBDA_HANDLER = 'ecommerce.ECommerceControlPlaneHandler';
 const LAMBDA_TIMEOUT_SECONDS = 30;
-const BUCKET_CODE_OBJECT_KEY = 'app.jar';
+const BUCKET_CODE_OBJECT_KEY = 'cp/app.jar';
 
 test('Control Plane Resources Created', () => {
   const template = Template.fromStack(controlPlaneStack);

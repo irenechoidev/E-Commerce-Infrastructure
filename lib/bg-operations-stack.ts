@@ -2,11 +2,15 @@ import { Duration, Stack, type StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { TableV2 } from 'aws-cdk-lib/aws-dynamodb';
+import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { CfnPipe } from "aws-cdk-lib/aws-pipes";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 interface BgOperationsStackProps extends StackProps {
-    productImageTable: TableV2
+    productImageTable: TableV2;
+    codeBucket: Bucket;
 }
 
 const APP_NAME = 'e-commerce';
@@ -15,11 +19,17 @@ const PIPE_NAME = `${APP_NAME}-bg-operations-pipe`;
 const PIPE_ROLE_NAME = `${APP_NAME}-bg-operations-pipe-role`;
 const MAX_SQS_RETENTION_PERIOD_DAYS = 14;
 
+const BG_OPERATIONS_LAMBDA_NAME = `${APP_NAME}-bg-operations-lambda`;
+const BG_OPERATIONS_LAMBDA_HANDLER = 'ecommerce.background.ECommerceBackgroundOperationsHandler';
+const BG_OPERATIONS_LAMBDA_TIMEOUT_SECONDS = 30;
+const CODE_BUCKET_NAME = `${APP_NAME}-code-artifact-bucket`;
+const BG_OPERATIONS_CODE_OBJECT_KEY = 'bg/app.jar';
+
 export class BgOperationsStack extends Stack {
   constructor(
     scope: Construct, 
     id: string, 
-    props?: BgOperationsStackProps
+    props: BgOperationsStackProps
   ) {
     super(scope, id, props);
 
@@ -35,7 +45,7 @@ export class BgOperationsStack extends Stack {
     props?.productImageTable.grantStreamRead(pipeRole);
     queue.grantSendMessages(pipeRole);
 
-    const ddbStreamArn = props?.productImageTable.tableStreamArn;
+    const ddbStreamArn = props.productImageTable.tableStreamArn;
     if (ddbStreamArn) {
       const isRemovePattern = JSON.stringify({ eventName: ["REMOVE"] });
 
@@ -54,5 +64,21 @@ export class BgOperationsStack extends Stack {
         target: queue.queueArn
       });
     }
+
+    const codeBucket = props.codeBucket;
+    const bgOperationsLambda = new Function(this, BG_OPERATIONS_LAMBDA_NAME, {
+      functionName: BG_OPERATIONS_LAMBDA_NAME,
+      runtime: Runtime.JAVA_17,
+      handler: BG_OPERATIONS_LAMBDA_HANDLER,
+      code: Code.fromBucket(codeBucket, BG_OPERATIONS_CODE_OBJECT_KEY),
+      timeout: Duration.seconds(BG_OPERATIONS_LAMBDA_TIMEOUT_SECONDS)
+    });
+
+    bgOperationsLambda.addToRolePolicy(new PolicyStatement({
+      actions: ['s3:GetObject'],
+      resources: [
+        `arn:aws:s3:::${CODE_BUCKET_NAME}/${BG_OPERATIONS_CODE_OBJECT_KEY}`
+      ],
+    }));
   }
 }

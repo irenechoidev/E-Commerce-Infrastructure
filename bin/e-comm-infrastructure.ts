@@ -28,7 +28,8 @@ const apiStack = new ApiStack(app, apiStackName, {
 const bgOperationsStackName = 'ECommerceBgOperationsStack';
 const bgOperationsStack = new BgOperationsStack(app, bgOperationsStackName, {
     env: { region: REGION },
-    productImageTable: controlPlaneStack.productImageTable
+    productImageTable: controlPlaneStack.productImageTable,
+    codeBucket: codeArtifactStack.bucket
 });
 
 bgOperationsStack.addDependency(controlPlaneStack);
