@@ -51,11 +51,13 @@ test('Bg Operations Resources Created', () => {
       DynamoDBStreamParameters: {
         StartingPosition: "TRIM_HORIZON"
       },
-      Filters: [
-        {
-          Pattern: isRemovePattern
-        }
-      ]
+      FilterCriteria: {
+        Filters: [
+            {
+              Pattern: isRemovePattern
+            }
+        ]
+      }
     }
   });
 });
