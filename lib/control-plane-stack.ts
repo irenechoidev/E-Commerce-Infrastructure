@@ -15,8 +15,8 @@ const PRODUCT_IMAGE_TABLE = `${APP_NAME}-product-image-table-v1`;
 const LAMBDA_NAME = `${CONTROL_PLANE_APP_NAME}-lambda`;
 const LAMBDA_HANDLER = 'ecommerce.ECommerceControlPlaneHandler';
 const LAMBDA_TIMEOUT_SECONDS = 30;
-const CODE_BUCKET_NAME = `${CONTROL_PLANE_APP_NAME}-bucket`;
-const CODE_BUCKET_CODE_OBJECT_KEY = 'app.jar';
+const CODE_BUCKET_NAME = `${APP_NAME}-code-artifact-bucket`;
+const CONTROL_PLANE_CODE_OBJECT_KEY = 'cp/app.jar';
 const IMAGES_BUCKET_NAME = `${APP_NAME}-images-bucket-v1`;
 
 interface ControlPlaneStackProps extends StackProps {
@@ -35,14 +35,14 @@ export class ControlPlaneStack extends Stack {
       functionName: LAMBDA_NAME,
       runtime: Runtime.JAVA_17,
       handler: LAMBDA_HANDLER,
-      code: Code.fromBucket(codeBucket, CODE_BUCKET_CODE_OBJECT_KEY),
+      code: Code.fromBucket(codeBucket, CONTROL_PLANE_CODE_OBJECT_KEY),
       timeout: Duration.seconds(LAMBDA_TIMEOUT_SECONDS)
     });
 
     this.lambdaFunction.addToRolePolicy(new PolicyStatement({
       actions: ['s3:GetObject'],
       resources: [
-        `arn:aws:s3:::${CODE_BUCKET_NAME}/${CODE_BUCKET_CODE_OBJECT_KEY}`
+        `arn:aws:s3:::${CODE_BUCKET_NAME}/${CONTROL_PLANE_CODE_OBJECT_KEY}`
       ],
     }));
 

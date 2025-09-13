@@ -6,8 +6,8 @@ const app = new cdk.App();
 const codeArtifactStackName = 'TestCodeArtifactStack';
 const codeArtifactStack = new CodeArtifactStack(app, codeArtifactStackName);
 
-const CONTROL_PLANE_APP_NAME = 'e-commerce-control-plane';
-const BUCKET_NAME = `${CONTROL_PLANE_APP_NAME}-bucket`;
+const CODE_ARTIFACT_APP_NAME = 'e-commerce-code-artifact';
+const BUCKET_NAME = `${CODE_ARTIFACT_APP_NAME}-bucket`;
 
 test('Code Artifact Resources Created', () => {
   const template = Template.fromStack(codeArtifactStack);
