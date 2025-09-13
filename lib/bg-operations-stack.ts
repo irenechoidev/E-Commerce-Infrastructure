@@ -7,6 +7,7 @@ import { CfnPipe } from "aws-cdk-lib/aws-pipes";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { SqsEventSource }  from "aws-cdk-lib/aws-lambda-event-sources";
 
 interface BgOperationsStackProps extends StackProps {
     productImageTable: TableV2;
@@ -18,6 +19,7 @@ const QUEUE_NAME = `${APP_NAME}-bg-operations-queue`;
 const PIPE_NAME = `${APP_NAME}-bg-operations-pipe`;
 const PIPE_ROLE_NAME = `${APP_NAME}-bg-operations-pipe-role`;
 const MAX_SQS_RETENTION_PERIOD_DAYS = 14;
+const SQS_BATCH_SIZE = 10;
 
 const BG_OPERATIONS_LAMBDA_NAME = `${APP_NAME}-bg-operations-lambda`;
 const BG_OPERATIONS_LAMBDA_HANDLER = 'ecommerce.background.ECommerceBackgroundOperationsHandler';
@@ -79,6 +81,11 @@ export class BgOperationsStack extends Stack {
       resources: [
         `arn:aws:s3:::${CODE_BUCKET_NAME}/${BG_OPERATIONS_CODE_OBJECT_KEY}`
       ],
+    }));
+
+    bgOperationsLambda.addEventSource(new SqsEventSource(queue, {
+        batchSize: SQS_BATCH_SIZE,       
+        enabled: true,
     }));
   }
 }

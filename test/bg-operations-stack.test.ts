@@ -22,6 +22,7 @@ const QUEUE_NAME = `${APP_NAME}-bg-operations-queue`;
 const PIPE_NAME = `${APP_NAME}-bg-operations-pipe`;
 const PIPE_ROLE_NAME = `${APP_NAME}-bg-operations-pipe-role`;
 const MAX_SQS_RETENTION_PERIOD_DAYS = 14;
+const SQS_BATCH_SIZE = 10;
 
 const BG_OPERATIONS_LAMBDA_NAME = `${APP_NAME}-bg-operations-lambda`;
 const BG_OPERATIONS_LAMBDA_HANDLER = 'ecommerce.background.ECommerceBackgroundOperationsHandler';
@@ -87,4 +88,9 @@ test('Bg Operations Resources Created', () => {
       ]),
     },
   });  
+
+  template.hasResourceProperties("AWS::Lambda::EventSourceMapping", {
+    BatchSize: SQS_BATCH_SIZE,
+    Enabled: true
+  });
 });
