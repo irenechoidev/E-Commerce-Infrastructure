@@ -12,6 +12,7 @@ import { SqsEventSource }  from "aws-cdk-lib/aws-lambda-event-sources";
 interface BgOperationsStackProps extends StackProps {
     productImageTable: TableV2;
     codeBucket: Bucket;
+    imageBucket: Bucket;
 }
 
 const APP_NAME = 'e-commerce';
@@ -26,6 +27,7 @@ const BG_OPERATIONS_LAMBDA_HANDLER = 'ecommerce.background.ECommerceBackgroundOp
 const BG_OPERATIONS_LAMBDA_TIMEOUT_SECONDS = 30;
 const CODE_BUCKET_NAME = `${APP_NAME}-code-artifact-bucket`;
 const BG_OPERATIONS_CODE_OBJECT_KEY = 'bg/app.jar';
+const IMAGES_BUCKET_NAME = `${APP_NAME}-images-bucket-v1`;
 
 export class BgOperationsStack extends Stack {
   constructor(
@@ -80,6 +82,13 @@ export class BgOperationsStack extends Stack {
       actions: ['s3:GetObject'],
       resources: [
         `arn:aws:s3:::${CODE_BUCKET_NAME}/${BG_OPERATIONS_CODE_OBJECT_KEY}`
+      ],
+    }));
+
+    bgOperationsLambda.addToRolePolicy(new PolicyStatement({
+      actions: ['s3:GetObject', 's3:DeleteObject'],
+      resources: [
+        `arn:aws:s3:::${IMAGES_BUCKET_NAME}/*`
       ],
     }));
 
