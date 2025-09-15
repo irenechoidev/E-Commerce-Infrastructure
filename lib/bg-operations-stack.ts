@@ -17,10 +17,12 @@ interface BgOperationsStackProps extends StackProps {
 
 const APP_NAME = 'e-commerce';
 const QUEUE_NAME = `${APP_NAME}-bg-operations-queue`;
+const DLQ_NAME = `${APP_NAME}-bg-operations-dlq`;
 const PIPE_NAME = `${APP_NAME}-bg-operations-pipe`;
 const PIPE_ROLE_NAME = `${APP_NAME}-bg-operations-pipe-role`;
 const MAX_SQS_RETENTION_PERIOD_DAYS = 14;
-const SQS_BATCH_SIZE = 10;
+const DLQ_RECIEVE_COUNT = 3;
+const SQS_BATCH_SIZE = 1;
 
 const BG_OPERATIONS_LAMBDA_NAME = `${APP_NAME}-bg-operations-lambda`;
 const BG_OPERATIONS_LAMBDA_HANDLER = 'ecommerce.background.ECommerceBackgroundOperationsHandler';
@@ -37,9 +39,18 @@ export class BgOperationsStack extends Stack {
   ) {
     super(scope, id, props);
 
+    const dlq = new Queue(this, DLQ_NAME, {
+        retentionPeriod: Duration.days(MAX_SQS_RETENTION_PERIOD_DAYS),
+        queueName: DLQ_NAME
+    })
+
     const queue = new Queue(this, QUEUE_NAME, {
         retentionPeriod: Duration.days(MAX_SQS_RETENTION_PERIOD_DAYS),
-        queueName: QUEUE_NAME
+        queueName: QUEUE_NAME,
+        deadLetterQueue: {
+            queue: dlq,
+            maxReceiveCount: DLQ_RECIEVE_COUNT
+        }
     });
 
     const pipeRole = new Role(this, PIPE_ROLE_NAME, {
