@@ -20,10 +20,12 @@ const bgOperationsStack = new BgOperationsStack(app, bgOperationsStackName, {
 
 const APP_NAME = 'e-commerce';
 const QUEUE_NAME = `${APP_NAME}-bg-operations-queue`;
+const DLQ_NAME = `${APP_NAME}-bg-operations-dlq`;
 const PIPE_NAME = `${APP_NAME}-bg-operations-pipe`;
 const PIPE_ROLE_NAME = `${APP_NAME}-bg-operations-pipe-role`;
 const MAX_SQS_RETENTION_PERIOD_DAYS = 14;
-const SQS_BATCH_SIZE = 10;
+const SQS_BATCH_SIZE = 1;
+const DLQ_RECIEVE_COUNT = 3;
 
 const BG_OPERATIONS_LAMBDA_NAME = `${APP_NAME}-bg-operations-lambda`;
 const BG_OPERATIONS_LAMBDA_HANDLER = 'ecommerce.background.ECommerceBackgroundOperationsHandler';
@@ -33,8 +35,16 @@ const BG_OPERATIONS_CODE_OBJECT_KEY = 'bg/app.jar';
 test('Bg Operations Resources Created', () => {
   const template = Template.fromStack(bgOperationsStack);
   template.hasResourceProperties('AWS::SQS::Queue', {
-    QueueName: QUEUE_NAME,
+    QueueName: DLQ_NAME,
     MessageRetentionPeriod: MAX_SQS_RETENTION_PERIOD_DAYS * 24 * 3600
+  });
+
+  template.hasResourceProperties('AWS::SQS::Queue', {
+    QueueName: QUEUE_NAME,
+    MessageRetentionPeriod: MAX_SQS_RETENTION_PERIOD_DAYS * 24 * 3600,
+    RedrivePolicy: {
+       maxReceiveCount: DLQ_RECIEVE_COUNT
+    }
   });
 
   template.hasResourceProperties('AWS::IAM::Role', {
